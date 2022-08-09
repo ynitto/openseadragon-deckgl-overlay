@@ -46,5 +46,7 @@ This will return a new object with the following methods:
 * `resize()`: If your viewer changes size, you'll need to resize the overlay by calling this method.
 
 
-See [online demo](https://ynitto.github.io/openseadragon-deckgl-overlay/demo.html) or demo.html for an example of it in use.
+See online demo or demo.html for an example of it in use.
 
+* [vanilla javascript demo](https://ynitto.github.io/openseadragon-deckgl-overlay/demo.html)
+* [typescript demo](https://ynitto.github.io/openseadragon-deckgl-overlay/example/demo.html)
