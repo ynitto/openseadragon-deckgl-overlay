@@ -6,14 +6,31 @@ Compatible with OpenSeadragon 3.1.0 or greater.
 
 ## Documentation
 
-To use, include the `openseadragon-deckgl-overlay.js` file after `openseadragon.js` on your web page.
-
-To add deck.gl overlay capability to your OpenSeadragon Viewer, call `deckOverlay(options)` on it. The argument `options` is a same type of [Deck constructor options](https://deck.gl/docs/api-reference/core/deck#properties).
+### ES Modules
+To use, import the `openseadragon-deckgl-overlay.js` file and create a new instance of `DeckGLOverlay`.
 
 For example:
 
 ```javascript
-var overlay = this.viewer.deckOverlay({
+import DeckGLOverlay from "openseadragon-deckgl-overlay.js";
+
+const overlay = new DeckGLOverlay(this.viewer, (parent) => new Deck({
+    parent,
+    views: [new OrthographicView({})],
+    controller: false,
+    layers: [new ScatterplotLayer({id: "scatterplot", ...})]
+}));
+```
+
+### For Vanilla js
+To use, include the `openseadragon-deckgl-overlay.js` file after `openseadragon.js` on your web page.
+
+To add deck.gl overlay capability to your OpenSeadragon Viewer, call `deckGLOverlay(options)` on it. The argument `options` is a same type of [Deck constructor options](https://deck.gl/docs/api-reference/core/deck#properties).
+
+For example:
+
+```javascript
+var overlay = this.viewer.deckGLOverlay({
     layers: [new ScatterplotLayer({id: "scatterplot", ...})]
 });
 ```

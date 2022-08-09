@@ -1,32 +1,34 @@
 (function() {
-  var $ = window.OpenSeadragon;
+  // ----------
+  if (window.OpenSeadragon && window.deck) {
+    const $ = window.OpenSeadragon;
+    const d = window.deck;
 
-  if (!$) {
-    $ = require('openseadragon');
-    if (!$) {
-      throw new Error('OpenSeadragon is missing.');
-    }
+    $.Viewer.prototype.deckGLOverlay = function(options) {
+      if (this._deckOverlay) {
+        return this._deckOverlay;
+      }
+
+      const factory = (parent) => {
+        return new d.Deck(Object.assign({
+          parent: parent,
+          views: new d.OrthographicView(),
+          controller: false
+        }, options || {}));
+      }
+
+      this._deckOverlay = new Overlay(this, factory);
+      return this._deckOverlay;
+    };
   }
 
   // ----------
-  $.Viewer.prototype.deckGLOverlay = function(options) {
-    if (this._deckOverlay) {
-      return this._deckOverlay;
-    }
-
-    this._deckOverlay = new Overlay(this, options);
-    return this._deckOverlay;
-  };
-
-  // ----------
-  var Overlay = function(viewer, options) {
+  const Overlay = function(viewer, deckFactory) {
     var self = this;
     this._viewer = viewer;
 
     this._containerWidth = 0;
     this._containerHeight = 0;
-    this._worldWidth = options.worldWidth | 0;
-    this._worldHeight = options.worldHeight | 0;
 
     this._canvasdiv = document.createElement('div');
     this._canvasdiv.style.position = 'absolute';
@@ -36,13 +38,7 @@
     this._canvasdiv.style.height = '100%';
     this._viewer.canvas.appendChild(this._canvasdiv);
 
-    options = Object.assign({
-      parent: this._canvasdiv,
-      views: new deck.OrthographicView(),
-      controller: false
-    }, options || {});
-
-    this._deck = new deck.Deck(options);
+    this._deck = deckFactory(this._canvasdiv);
 
     this._viewer.addHandler('update-viewport', function () {
       self.resize();
@@ -93,4 +89,18 @@
       viewport.silenceMultiImageWarnings = lastFlag;
     }
   };
+
+  (function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    } else if (typeof define === "function" && define.amd) {
+        define(["require", "exports"], factory);
+    }
+  })(function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.DeckGLOverlay = Overlay;
+  });
+
 })();
