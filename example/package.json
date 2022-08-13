@@ -10,10 +10,7 @@
   "author": "ynitto <ynitto7@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@deck.gl/core": "^8.8.6",
-    "@deck.gl/layers": "^8.8.6",
-    "@nebula.gl/layers": "^1.0.3",
-    "@nebula.gl/overlays": "^1.0.3",
+    "deck.gl": "^8.8.7",
     "nebula.gl": "^1.0.3",
     "openseadragon": "^3.1.0"
   },

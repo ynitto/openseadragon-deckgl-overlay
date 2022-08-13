@@ -6,7 +6,7 @@ Compatible with OpenSeadragon 3.1.0 or greater.
 
 ## Documentation
 
-### ES Modules
+### for ES Modules
 To use, import the `openseadragon-deckgl-overlay.js` file and create a new instance of `DeckGLOverlay`.
 
 For example:
@@ -42,7 +42,7 @@ If you omit to set options, it will use the default options;
 
 This will return a new object with the following methods:
 
-* `deck()`: Gives access to [Deck](https://deck.gl/docs/api-reference/core/deck), to add graphics.
+* `deck()`: Gives access to [Deck](https://deck.gl/docs/api-reference/core/deck).
 * `resize()`: If your viewer changes size, you'll need to resize the overlay by calling this method.
 
 

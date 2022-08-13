@@ -2,8 +2,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "ES5",
-    "module": "ES2015",
-    "strict": true,
+    "module": "ESNext",
     "moduleResolution": "node"
   }
 }
