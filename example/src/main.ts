@@ -4,6 +4,19 @@ import { Deck, OrthographicView, Position } from "@deck.gl/core";
 import { CompositeMode, DrawLineStringMode, ModifyMode, ViewMode } from "@nebula.gl/edit-modes";
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
+const getFeatureIndex = (info) => {
+  if (info.picked) {
+    if (info.object?.properties?.featureIndex != null) {
+      return info.object.properties.featureIndex;
+    }
+    if (info.index != null) {
+      return info.index;
+    }
+    return -1;
+  }
+  return -1;
+}
+
 class App {
   viewer: Viewer;
   overlay: any;
@@ -11,7 +24,6 @@ class App {
   editing: boolean;
   zoom: number;
   geojson: any;
-  hoveredIndex: number;
   selectedIndex: number;
 
   constructor() {
@@ -34,6 +46,7 @@ class App {
       prefixUrl: "openseadragon/images/",
       showNavigationControl: false,
       tileSources: tileSource,
+      maxZoomPixelRatio: 3.0,
       gestureSettingsMouse: {
         clickToZoom: false,
         dblClickToZoom: false
@@ -48,8 +61,7 @@ class App {
       parent,
       views: [new OrthographicView({})],
       controller: false,
-      pickingRadius: 5,
-      getCursor: ({isDragging}) => isDragging ? 'crosshair' : 'grab'
+      getCursor: () => 'crosshair'
     }));
 
     this.editable = false;
@@ -61,13 +73,11 @@ class App {
       features: []
     };
 
-    this.hoveredIndex = -1;
     this.selectedIndex = -1;
   }
 
   run() {
-    const d = this.overlay.deck();
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 50000; i++) {
       let x = Math.random() * 7026;
       let y = Math.random() * 9221;
 
@@ -98,9 +108,12 @@ class App {
     });
     this.viewer.addHandler("zoom", (e) => {
       this.zoom = this.viewer.viewport.viewportToImageZoom(e.zoom);
-      d.setProps({
-        layers: this.createLayers()
-      });
+
+      const prevEditable = this.editable;
+      this.editable = this.zoom > 2.0;
+      if (prevEditable != this.editable) {
+        this.update();
+      }
     });
 
     this.update();
@@ -113,11 +126,9 @@ class App {
       layers
     });
   }
+
   createLayers() {
     const indexes = new Array<number>();
-    if (this.hoveredIndex >= 0) {
-      indexes.push(this.hoveredIndex);
-    }
     if (this.selectedIndex >= 0) {
       indexes.push(this.selectedIndex);
     }
@@ -126,27 +137,32 @@ class App {
       new (EditableGeoJsonLayer as any)({
         id: 'editor',
         data: this.geojson,
-        mode: this.getMode(),
+        mode: this.editable ? new CompositeMode([new DrawLineStringMode(), new ModifyMode()]) : new ViewMode(),
         selectedFeatureIndexes: indexes,
-        lineWidthMinPixels: 3,
+        lineWidthMinPixels: 1,
         lineWidthMaxPixels: 3,
-        pickingLineWidthExtraPixels: 3,
         editHandlePointOutline: true,
         editHandlePointStrokeWidth: 1,
         editHandlePointRadiusMinPixels: 3,
-        editHandlePointRadiusMaxPixels: 3,
-        getEditHandlePointColor: [0,0,0,0],
+        editHandlePointRadiusMaxPixels: 5,
+        getEditHandlePointColor: [0, 0, 0, 0],
         pickable: true,
         getLineColor: (feature, isSelected, mode) => feature.properties.color,
-        onHover: ({ index }) => {
-          if (!this.editing) {
-            this.hoveredIndex = (index == null || index < 0) ? -1 : index;
+        onHover: (info) => {
+          this.editing = info.picked || info.featureType || false;
+          const index = getFeatureIndex(info);
+          if (this.editable && this.selectedIndex !== index) {
+            this.selectedIndex = index;
             this.update();
           }
         },
-        onClick: ({ index }) => {
-          if (!this.editing) {
-            this.selectedIndex = (index == null || index < 0) ? -1 : index;
+        onDragStart: (info) => {
+          this.editing = info.picked || info.featureType || false;
+        },
+        onDragEnd: () => {
+          this.editing = false;
+          if (this.selectedIndex >= 0) {
+            this.selectedIndex = -1;
             this.update();
           }
         },
@@ -162,7 +178,7 @@ class App {
 
           if (editType !== "addTentativePosition") {
             this.geojson = updatedData;
-            this.selectedIndex = editContext.featureIndexes[0];
+            this.selectedIndex = (editType === "addFeature") ? -1 : editContext.featureIndexes[0];
             this.update();
           }
 
@@ -172,9 +188,6 @@ class App {
         }
       })
     ];
-  }
-  getMode() {
-    return (this.zoom > 0.8) ? new CompositeMode([new DrawLineStringMode(), new ModifyMode()]) : new ViewMode();
   }
 }
 
