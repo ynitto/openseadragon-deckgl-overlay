@@ -6,7 +6,7 @@ Compatible with OpenSeadragon 3.1.0 or greater.
 
 ## Documentation
 
-### for ES Modules
+### For ES Modules
 To use, import the `openseadragon-deckgl-overlay.js` file and create a new instance of `DeckGLOverlay`.
 
 For example:
@@ -22,7 +22,7 @@ const overlay = new DeckGLOverlay(this.viewer, (parent) => new Deck({
 }));
 ```
 
-### For Vanilla js
+### For Pure Javascript
 To use, include the `openseadragon-deckgl-overlay.js` file after `openseadragon.js` on your web page.
 
 To add deck.gl overlay capability to your OpenSeadragon Viewer, call `deckGLOverlay(options)` on it. The argument `options` is a same type of [Deck constructor options](https://deck.gl/docs/api-reference/core/deck#properties).
@@ -46,7 +46,7 @@ This will return a new object with the following methods:
 * `resize()`: If your viewer changes size, you'll need to resize the overlay by calling this method.
 
 
-See online demo or demo.html for an example of it in use.
+See online demo or demo.html for examples of it in use.
 
-* [vanilla javascript demo](https://ynitto.github.io/openseadragon-deckgl-overlay/demo.html)
-* [typescript demo](https://ynitto.github.io/openseadragon-deckgl-overlay/example/demo.html)
+* [pure javascript demo](https://ynitto.github.io/openseadragon-deckgl-overlay/demo.html)
+* [typescript demo with nebula.gl](https://ynitto.github.io/openseadragon-deckgl-overlay/example/demo.html)
