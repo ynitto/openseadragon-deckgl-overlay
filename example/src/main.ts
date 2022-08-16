@@ -112,28 +112,22 @@ class App {
       const prevEditable = this.editable;
       this.editable = this.zoom > 2.0;
       if (prevEditable != this.editable) {
-        this.update();
+        this.render();
       }
     });
 
-    this.update();
+    this.render();
   }
 
-  update() {
+  render() {
     const d = this.overlay.deck();
-    const layers = this.createLayers();
-    d.setProps({
-      layers
-    });
-  }
 
-  createLayers() {
     const indexes = new Array<number>();
     if (this.selectedIndex >= 0) {
       indexes.push(this.selectedIndex);
     }
 
-    return [
+    const layers = [
       new (EditableGeoJsonLayer as any)({
         id: 'editor',
         data: this.geojson,
@@ -153,7 +147,7 @@ class App {
           const index = getFeatureIndex(info);
           if (this.editable && this.selectedIndex !== index) {
             this.selectedIndex = index;
-            this.update();
+            this.render();
           }
         },
         onDragStart: (info) => {
@@ -163,7 +157,7 @@ class App {
           this.editing = false;
           if (this.selectedIndex >= 0) {
             this.selectedIndex = -1;
-            this.update();
+            this.render();
           }
         },
         onEdit: ({editType, updatedData, editContext}) => {
@@ -179,7 +173,7 @@ class App {
           if (editType !== "addTentativePosition") {
             this.geojson = updatedData;
             this.selectedIndex = (editType === "addFeature") ? -1 : editContext.featureIndexes[0];
-            this.update();
+            this.render();
           }
 
           if (editType === "finishMovePosition" || editType === "addFeature") {
@@ -188,6 +182,10 @@ class App {
         }
       })
     ];
+
+    d.setProps({
+      layers
+    });
   }
 }
 
